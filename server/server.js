@@ -1,14 +1,15 @@
 require("dotenv").config();
 const connectDB = require("./config/db");
 connectDB();
-console.log(process.env.GEMINI_API_KEY);
 
 const express = require("express");
+const cors = require("cors");
 
 const app = express();
+app.use(cors({ origin: process.env.CLIENT_URL || "http://localhost:5173" }));
 app.use(express.json());
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 const chatRoutes = require("./routes/chatRoutes");
 

@@ -32,6 +32,19 @@ async function chat(req, res) {
     }
 }
 
+async function getChat(req, res) {
+    try {
+        const userID = req.params.userID;
+        const conversation = await getConversation(userID);
+        res.json({ messages: conversation.messages });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+}
+
 async function clearChat(req, res) {
     try {
         const userID = req.params.userID;
@@ -48,4 +61,4 @@ async function clearChat(req, res) {
     }
 }
 
-module.exports = { chat, clearChat }
+module.exports = { chat, getChat, clearChat }
