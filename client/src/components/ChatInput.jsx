@@ -8,19 +8,22 @@ function ChatInput({ value, onChange, onSend, onClear, disabled, isLoading }) {
 
   return (
     <div className="chat-input-shell">
-      <div className="chat-input-actions">
+      <div className="composer-toolbar">
+        <span className="composer-label">Message CogniForge</span>
         <button
           type="button"
           className="secondary-button"
           onClick={onClear}
           disabled={disabled}
         >
-          Clear conversation
+          <span aria-hidden="true">↺</span>
+          Clear chat
         </button>
       </div>
 
       <div className="composer">
         <textarea
+          aria-label="Message CogniForge"
           value={value}
           onChange={(event) => onChange(event.target.value)}
           onKeyDown={handleKeyDown}
@@ -35,7 +38,8 @@ function ChatInput({ value, onChange, onSend, onClear, disabled, isLoading }) {
           onClick={onSend}
           disabled={disabled || !value.trim()}
         >
-          {isLoading ? 'Sending...' : 'Send'}
+          <span>{isLoading ? 'Sending...' : 'Send'}</span>
+          <span className="send-arrow" aria-hidden="true">↗</span>
         </button>
       </div>
     </div>
