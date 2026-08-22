@@ -2,6 +2,10 @@
 
 CogniForge is a full-stack AI workspace for focused conversations, learning, and problem solving. It combines a React and Vite client with an Express API, MongoDB persistence, and Google Gemini responses.
 
+## Live Demo
+
+[Open the CogniForge live demo](https://cogniforge-f4oq.onrender.com)
+
 ![CogniForge Chat Demo](./screenshots/screenshot.png)
 
 ## Features
@@ -18,11 +22,30 @@ CogniForge is a full-stack AI workspace for focused conversations, learning, and
 
 ## Tech Stack
 
-- **Frontend:** React, Vite, plain CSS
-- **Backend:** Node.js, Express.js
-- **Database:** MongoDB, Mongoose
-- **AI:** Google Gemini API, `@google/genai`
-- **Configuration:** `dotenv`
+### Frontend
+
+- React
+- Vite
+- Plain CSS
+
+### Backend
+
+- Node.js
+- Express.js
+
+### Database
+
+- MongoDB
+- Mongoose
+
+### AI
+
+- Google Gemini API
+- `@google/genai`
+
+### Configuration
+
+- `dotenv`
 
 ## Project Structure
 
@@ -32,6 +55,7 @@ CogniForge/
 │   ├── public/
 │   ├── src/
 │   │   ├── api/
+│   │   ├── assets/
 │   │   ├── components/
 │   │   └── utils/
 │   ├── index.html
@@ -46,22 +70,35 @@ CogniForge/
 │   ├── .env.example
 │   ├── package.json
 │   └── server.js
+├── screenshots/
+│   └── screenshot.png
 └── README.md
 ```
 
 ## Installation and Setup
 
-### 1. Install dependencies
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/rohannayak032/CogniForge.git
+cd CogniForge
+```
+
+### 2. Install client dependencies
 
 ```bash
 cd client
 npm install
+```
 
+### 3. Install server dependencies
+
+```bash
 cd ../server
 npm install
 ```
 
-### 2. Configure the server
+### 4. Configure environment variables
 
 Create `server/.env` using `server/.env.example`:
 
@@ -72,18 +109,24 @@ GEMINI_API_KEY=your_google_gemini_api_key
 CLIENT_URL=http://localhost:5173
 ```
 
-The client reads `VITE_API_URL` when provided. Otherwise, it uses the current origin and the local Vite proxy for `/chat` requests.
+Optionally, create `client/.env` and set the API base URL:
 
-### 3. Start the application
+```env
+VITE_API_URL=http://localhost:5000
+```
 
-Start the backend in one terminal:
+When `VITE_API_URL` is not provided, the Vite development proxy handles `/chat` requests.
+
+### 5. Start the backend
 
 ```bash
 cd server
 npm run dev
 ```
 
-Start the frontend in another terminal:
+### 6. Start the frontend
+
+In another terminal:
 
 ```bash
 cd client
@@ -94,15 +137,13 @@ npm run dev
 
 ### Get conversation history
 
-```http
-GET /chat/:userID
-```
+`GET /chat/:userID` — retrieve conversation history.
 
 ### Send a message
 
-```http
-POST /chat
-```
+`POST /chat` — send a message and generate a Gemini response.
+
+Request body:
 
 ```json
 {
@@ -113,6 +154,21 @@ POST /chat
 
 ### Clear conversation history
 
-```http
-DELETE /chat/:userID
-```
+`DELETE /chat/:userID` — clear conversation history.
+
+## Deployment
+
+CogniForge is deployed as separate frontend and backend services using:
+
+- React + Vite frontend
+- Node.js + Express backend
+- MongoDB Atlas
+- Google Gemini API
+
+The frontend communicates with the deployed Express API through `VITE_API_URL`.
+
+## Author
+
+**Rohan Nayak**
+
+[GitHub repository](https://github.com/rohannayak032/CogniForge)
