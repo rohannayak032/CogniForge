@@ -1,6 +1,7 @@
 const Document = require("../models/Document");
 const DocumentChunk = require("../models/DocumentChunk");
 const { extractPdfChunks } = require("../services/pdfService");
+const { generateChunkEmbeddings } = require("../services/embeddingService");
 
 async function uploadDocument(req, res) {
     const userID = req.body.userID;
@@ -42,9 +43,10 @@ async function uploadDocument(req, res) {
         });
 
         const { pageCount, chunks } = await extractPdfChunks(req.file.buffer);
+        const chunksWithEmbeddings = await generateChunkEmbeddings(chunks);
 
-        if (chunks.length) {
-            await DocumentChunk.insertMany(chunks.map((chunk) => ({
+        if (chunksWithEmbeddings.length) {
+            await DocumentChunk.insertMany(chunksWithEmbeddings.map((chunk) => ({
                 ...chunk,
                 userID,
                 documentId: document._id,
@@ -59,7 +61,7 @@ async function uploadDocument(req, res) {
         return res.status(201).json({
             success: true,
             document,
-            chunkCount: chunks.length
+            chunkCount: chunksWithEmbeddings.length
         });
     } catch (error) {
         if (document) {
@@ -70,7 +72,7 @@ async function uploadDocument(req, res) {
         console.error(error);
         return res.status(422).json({
             success: false,
-            message: "Unable to extract text from the PDF"
+            message: "Unable to process the PDF and generate embeddings"
         });
     }
 }
