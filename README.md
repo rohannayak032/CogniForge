@@ -14,11 +14,24 @@ CogniForge is a full-stack AI workspace for focused conversations, learning, and
 - Full-screen React AI workspace
 - Persistent conversation history with MongoDB
 - Context-aware conversations
+- PDF document upload and text extraction
+- Document chunking and semantic embeddings
 - Conversation clearing
 - Light and dark themes
 - Suggested prompts
 - Responsive interface
 - Environment-based configuration
+
+## Document Processing
+
+CogniForge supports PDF document ingestion for knowledge-based interactions.
+
+Uploaded PDFs are:
+
+1. Extracted page-by-page
+2. Split into smaller text chunks
+3. Converted into semantic embeddings using Google Gemini
+4. Stored in MongoDB along with document and page metadata
 
 ## Tech Stack
 
