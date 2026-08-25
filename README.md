@@ -21,17 +21,24 @@ CogniForge is a full-stack AI workspace for focused conversations, learning, and
 - Suggested prompts
 - Responsive interface
 - Environment-based configuration
+- PDF document upload and text extraction
+- Document chunking and semantic embeddings
+- MongoDB Atlas Vector Search retrieval
+- User-scoped document retrieval
 
 ## Document Processing
 
-CogniForge supports PDF document ingestion for knowledge-based interactions.
+CogniForge supports PDF document ingestion and semantic retrieval.
 
 Uploaded PDFs are:
 
 1. Extracted page-by-page
 2. Split into smaller text chunks
 3. Converted into semantic embeddings using Google Gemini
-4. Stored in MongoDB along with document and page metadata
+4. Stored in MongoDB with document and page metadata
+5. Retrieved using MongoDB Atlas Vector Search based on semantic similarity
+
+Document retrieval is scoped by user, ensuring that users only retrieve content from their own uploaded documents.
 
 ## Tech Stack
 
