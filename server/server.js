@@ -12,8 +12,10 @@ app.use(express.json());
 const PORT = process.env.PORT || 5000;
 
 const chatRoutes = require("./routes/chatRoutes");
+const documentRoutes = require("./routes/documentRoutes");
 
 app.use(chatRoutes);
+app.use(documentRoutes);
 
 app.get("/", (req, res) => {
     res.json({
