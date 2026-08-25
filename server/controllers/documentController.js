@@ -2,6 +2,7 @@ const Document = require("../models/Document");
 const DocumentChunk = require("../models/DocumentChunk");
 const { extractPdfChunks } = require("../services/pdfService");
 const { generateChunkEmbeddings } = require("../services/embeddingService");
+const { retrieveSimilarChunks } = require("../services/retrievalService");
 
 async function uploadDocument(req, res) {
     const userID = req.body.userID;
@@ -77,4 +78,30 @@ async function uploadDocument(req, res) {
     }
 }
 
-module.exports = { uploadDocument };
+async function searchDocuments(req, res) {
+    const { userID, query, topK } = req.body;
+
+    if (!userID || !query?.trim()) {
+        return res.status(400).json({
+            success: false,
+            message: "userID and query are required"
+        });
+    }
+
+    try {
+        const chunks = await retrieveSimilarChunks(userID, query.trim(), topK);
+        return res.json({
+            success: true,
+            chunks
+        });
+    } catch (error) {
+        console.error(error);
+        const isIndexError = error.message?.includes("Vector Search index");
+        return res.status(isIndexError ? 503 : 500).json({
+            success: false,
+            message: isIndexError ? error.message : "Unable to search document chunks"
+        });
+    }
+}
+
+module.exports = { uploadDocument, searchDocuments };

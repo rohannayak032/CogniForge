@@ -37,4 +37,4 @@ async function generateChunkEmbeddings(chunks) {
     return chunksWithEmbeddings;
 }
 
-module.exports = { generateChunkEmbeddings };
+module.exports = { generateEmbedding, generateChunkEmbeddings };
