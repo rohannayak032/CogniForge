@@ -7,6 +7,10 @@ export default defineConfig({
   server: {
     proxy: {
       '/chat': 'http://localhost:5000',
-    },
-  },
+      '/documents': {
+        target: 'http://localhost:5000',
+        changeOrigin: true
+      }
+    }
+  }
 })

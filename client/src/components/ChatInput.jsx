@@ -1,4 +1,4 @@
-function ChatInput({ value, onChange, onSend, onClear, disabled, isLoading }) {
+function ChatInput({ value, onChange, onSend, onClear, disabled, isLoading, mode, documentName }) {
   const handleKeyDown = (event) => {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
@@ -9,7 +9,7 @@ function ChatInput({ value, onChange, onSend, onClear, disabled, isLoading }) {
   return (
     <div className="chat-input-shell">
       <div className="composer-toolbar">
-        <span className="composer-label">Message CogniForge</span>
+        <span className="composer-label">{mode === 'document' ? `Ask ${documentName || 'your document'}` : 'Message CogniForge'}</span>
         <button
           type="button"
           className="secondary-button"

@@ -16,6 +16,7 @@ function MessageList({ messages = [], messageListRef, onSuggestedPrompt }) {
             key={`${message.role}-${index}-${message.text}`}
             role={message.role}
             text={message.text}
+            sources={message.sources}
           />
         ))
       ) : (

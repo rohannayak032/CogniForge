@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { getHistory, sendMessage, clearHistory } from '../api/chat';
+import { askDocument, uploadDocument } from '../api/documents';
 import { getOrCreateUserID } from '../utils/userId';
 import MessageList from './MessageList';
 import ChatInput from './ChatInput';
+import DocumentControls from './DocumentControls';
 
 function ChatWindow() {
   const [userID] = useState(() => getOrCreateUserID());
@@ -13,6 +15,9 @@ function ChatWindow() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem('cogniforge-theme') || 'light');
+  const [mode, setMode] = useState('general');
+  const [document, setDocument] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
   const messageListRef = useRef(null);
 
   const loadMessages = async () => {
@@ -47,7 +52,7 @@ function ChatWindow() {
   const handleSend = async () => {
     const trimmedInput = inputValue.trim();
 
-    if (!trimmedInput || isLoading) {
+    if (!trimmedInput || isLoading || isUploading || (mode === 'document' && document?.status !== 'ready')) {
       return;
     }
 
@@ -60,16 +65,46 @@ function ChatWindow() {
     ]);
 
     try {
-      const response = await sendMessage(userID, trimmedInput);
+      const response = mode === 'document'
+        ? await askDocument(userID, trimmedInput)
+        : await sendMessage(userID, trimmedInput);
 
       setMessages((currentMessages) => [
         ...currentMessages,
-        { role: 'assistant', text: response?.reply || 'No response received.' },
+        {
+          role: 'assistant',
+          text: response?.answer || response?.reply || 'No response received.',
+          sources: mode === 'document' ? response?.sources || [] : undefined,
+        },
       ]);
     } catch (err) {
       setError(err.message || 'Unable to send the message right now.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleUpload = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+
+    if (!file) {
+      return;
+    }
+
+    setError('');
+    setIsUploading(true);
+    setDocument({ originalName: file.name, status: 'processing' });
+
+    try {
+      const response = await uploadDocument(userID, file);
+      setDocument(response?.document || { originalName: file.name, status: 'ready' });
+      setMode('document');
+    } catch (err) {
+      setDocument(null);
+      setError(err.message || 'Unable to upload and process the PDF right now.');
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -125,6 +160,16 @@ function ChatWindow() {
         </button>
 
         {isSidebarOpen ? (
+          <DocumentControls
+            document={document}
+            mode={mode}
+            isUploading={isUploading}
+            onModeChange={setMode}
+            onUpload={handleUpload}
+          />
+        ) : null}
+
+        {isSidebarOpen ? (
           <div className="sidebar-footer">
             <button type="button" className="settings-item" onClick={() => setIsSettingsOpen(true)}>
               <span aria-hidden="true">⚙</span>
@@ -166,8 +211,10 @@ function ChatWindow() {
           onChange={setInputValue}
           onSend={handleSend}
           onClear={handleClear}
-          disabled={isLoading}
-          isLoading={isLoading}
+          disabled={isLoading || isUploading || (mode === 'document' && document?.status !== 'ready')}
+          isLoading={isLoading || isUploading}
+          mode={mode}
+          documentName={document?.originalName}
         />
 
         {isSettingsOpen ? (

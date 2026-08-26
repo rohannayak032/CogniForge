@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-function MessageBubble({ role, text }) {
+function MessageBubble({ role, text, sources = [] }) {
   const isUser = role === 'user';
   const [isCopied, setIsCopied] = useState(false);
 
@@ -34,6 +34,17 @@ function MessageBubble({ role, text }) {
       <div className={`message-bubble ${isUser ? 'user' : 'assistant'}`}>
         <span className="message-role">{isUser ? 'You' : 'Assistant'}</span>
         <p>{formattedText}</p>
+        {!isUser && sources.length ? (
+          <div className="message-sources">
+            <span className="sources-label">Sources</span>
+            {sources.map((source) => (
+              <div className="source-item" key={`${source.documentId}-${source.pageNumber}-${source.chunkIndex}`}>
+                <strong>{source.documentName}</strong>
+                <span>Page {source.pageNumber} · Chunk {source.chunkIndex} · Score {Number(source.score || 0).toFixed(2)}</span>
+              </div>
+            ))}
+          </div>
+        ) : null}
         {!isUser ? (
           <button type="button" className="copy-button" onClick={handleCopy} aria-label="Copy assistant response">
             <span aria-hidden="true">{isCopied ? '✓' : '□'}</span>

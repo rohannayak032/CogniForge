@@ -958,3 +958,164 @@
     flex-direction: column;
   }
 }
+
+.document-controls {
+  margin-top: 28px;
+}
+
+.mode-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid #d5e1da;
+  border-radius: 9px;
+  background: #edf3ee;
+}
+
+.mode-toggle button {
+  min-height: 34px;
+  padding: 6px 5px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.mode-toggle button.selected {
+  background: var(--panel);
+  color: var(--accent-dark);
+  box-shadow: 0 1px 3px rgba(31, 57, 48, 0.1);
+}
+
+.document-upload {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  margin-top: 10px;
+  border: 1px dashed #a9c9ba;
+  border-radius: 8px;
+  color: var(--accent-dark);
+  cursor: pointer;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.document-upload:hover,
+.document-upload:focus-within {
+  background: #edf6f0;
+}
+
+.document-upload.is-uploading {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.document-upload input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.active-document {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 9px;
+  border: 1px solid #e0e8e2;
+  border-radius: 8px;
+  background: #fbfdfb;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.active-document strong,
+.active-document span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.active-document strong {
+  max-width: 190px;
+  color: var(--ink);
+  font-size: 0.74rem;
+}
+
+.document-status {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  margin-top: 4px;
+  border-radius: 50%;
+  background: #d09b45;
+}
+
+.active-document.ready .document-status {
+  background: #3aa477;
+}
+
+.document-hint {
+  margin: 10px 8px 0;
+  color: #9aa8a2;
+  font-size: 0.7rem;
+  line-height: 1.45;
+}
+
+.message-sources {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid #dce8e0;
+}
+
+.sources-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--accent-dark);
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.source-item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px 8px;
+  color: var(--muted);
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+
+.source-item strong {
+  color: var(--ink);
+}
+
+.theme-dark .mode-toggle,
+.theme-dark .active-document {
+  border-color: var(--line);
+  background: #1b2230;
+}
+
+.theme-dark .mode-toggle button.selected {
+  background: #2a3852;
+  color: var(--accent-dark);
+}
+
+.theme-dark .document-upload:hover,
+.theme-dark .document-upload:focus-within {
+  background: #202b3d;
+}
+
+.theme-dark .message-sources {
+  border-color: var(--line);
+}
