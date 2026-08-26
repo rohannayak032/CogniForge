@@ -1,205 +1,127 @@
 # CogniForge
 
-CogniForge is a full-stack AI workspace for focused conversations, learning, and problem solving. It combines a React and Vite client with an Express API, MongoDB persistence, and Google Gemini responses.
+CogniForge is a full-stack AI workspace that combines general AI conversations with document-based Retrieval-Augmented Generation (RAG). Users can upload PDFs, select documents, ask questions, and receive grounded answers with source references.
 
-## Live Demo
+## Demo
 
-[Open the CogniForge live demo](https://cogniforge-f4oq.onrender.com)
-
-![CogniForge Chat Demo](./screenshots/screenshot.png)
+![CogniForge Demo](./screenshots/screenshot.png)
 
 ## Features
 
-- Gemini-powered AI conversations with persistent chat history
-- PDF document upload, text extraction, and semantic chunking
-- Gemini-powered document embeddings
-- MongoDB Atlas Vector Search for semantic retrieval
-- Retrieval-Augmented Generation (RAG) with grounded responses
-- Source references for retrieved document content
-- User-scoped document retrieval
-- Responsive React interface with light and dark themes
-- Suggested prompts and conversation management
-
-## Document Processing
-
-CogniForge supports PDF-based retrieval augmented generation.
-
-Uploaded PDFs are:
-
-1. Extracted page-by-page
-2. Split into smaller text chunks
-3. Converted into semantic embeddings using Google Gemini
-4. Stored in MongoDB with document and page metadata
-5. Retrieved using MongoDB Atlas Vector Search
-6. Provided as context to Gemini for grounded responses
-
-Responses include source document and page information for retrieved content.
+- Gemini-powered AI conversations
+- Persistent conversation history
+- PDF upload and text extraction
+- Page-aware text chunking and Gemini embeddings
+- MongoDB Atlas Vector Search
+- Document-grounded RAG responses
+- Multi-document library with selection and deletion
+- User- and document-scoped retrieval
+- Source references with page and similarity information
+- Light/dark themes and responsive UI
 
 ## Tech Stack
 
 ### Frontend
 
-- React
-- Vite
-- Plain CSS
+React, Vite, CSS
 
 ### Backend
 
-- Node.js
-- Express.js
-
-### Database
-
-- MongoDB
-- Mongoose
+Node.js, Express.js
 
 ### AI
 
-- Google Gemini API
-- `@google/genai`
+Google Gemini API, Gemini Embeddings
 
-### Configuration
+### Database
 
-- `dotenv`
+MongoDB, Mongoose, MongoDB Atlas Vector Search
+
+### Other
+
+Multer, PDF.js
+
+## Architecture
+
+```text
+React + Vite
+  ↓
+Express API
+  ↓
+General Chat → Gemini
+
+Document RAG
+  ↓
+PDF Extraction
+  ↓
+Chunking
+  ↓
+Gemini Embeddings
+  ↓
+MongoDB Atlas
+  ↓
+Vector Search
+  ↓
+Relevant Chunks
+  ↓
+Gemini
+  ↓
+Grounded Answer + Sources
+```
+
+## RAG Pipeline
+
+1. A user uploads a PDF.
+2. PDF.js extracts text page by page.
+3. Extracted text is split into page-aware, overlapping chunks.
+4. Gemini generates an embedding for each chunk.
+5. Chunks, embeddings, and page metadata are stored in MongoDB.
+6. A document question is converted into a query embedding and searched through MongoDB Atlas Vector Search.
+7. Retrieved chunks are provided to Gemini to generate a grounded answer.
+8. The response includes source document, page, chunk, and similarity information.
+
+Retrieval is scoped by both user ID and the selected document ID.
 
 ## Project Structure
 
 ```text
 CogniForge/
 ├── client/
-│   ├── public/
-│   ├── src/
-│   │   ├── api/
-│   │   ├── assets/
-│   │   ├── components/
-│   │   └── utils/
-│   ├── index.html
-│   ├── package.json
-│   └── vite.config.js
+│   └── src/
+│       ├── api/
+│       └── components/
 ├── server/
-│   ├── config/
 │   ├── controllers/
+│   ├── middleware/
 │   ├── models/
 │   ├── routes/
-│   ├── services/
-│   ├── .env.example
-│   ├── package.json
-│   └── server.js
-├── screenshots/
-│   └── screenshot.png
+│   └── services/
 └── README.md
 ```
 
-## Installation and Setup
+## Running Locally
 
-### 1. Clone the repository
+### Backend
 
 ```bash
-git clone https://github.com/rohannayak032/CogniForge.git
-cd CogniForge
+cd server
+npm install
+npm run dev
 ```
 
-### 2. Install client dependencies
+### Frontend
 
 ```bash
 cd client
 npm install
+npm run dev
 ```
 
-### 3. Install server dependencies
-
-```bash
-cd ../server
-npm install
-```
-
-### 4. Configure environment variables
-
-Create `server/.env` using `server/.env.example`:
+Create `server/.env` with:
 
 ```env
 PORT=5000
 MONGODB_URI=your_mongodb_connection_string
-GEMINI_API_KEY=your_google_gemini_api_key
+GEMINI_API_KEY=your_gemini_api_key
 RAG_TOP_K=5
-CLIENT_URL=http://localhost:5173
 ```
-
-Optionally, create `client/.env` and set the API base URL:
-
-```env
-VITE_API_URL=http://localhost:5000
-```
-
-When `VITE_API_URL` is not provided, the Vite development proxy handles `/chat` requests.
-
-### 5. Start the backend
-
-```bash
-cd server
-npm run dev
-```
-
-### 6. Start the frontend
-
-In another terminal:
-
-```bash
-cd client
-npm run dev
-```
-
-## API Endpoints
-
-### Get conversation history
-
-`GET /chat/:userID` — retrieve conversation history.
-
-### Send a message
-
-`POST /chat` — send a message and generate a Gemini response.
-
-Request body:
-
-```json
-{
-  "userID": "user-123",
-  "prompt": "Hello!"
-}
-```
-
-### Clear conversation history
-
-`DELETE /chat/:userID` — clear conversation history.
-
-### Ask a question about uploaded documents
-
-`POST /documents/ask` — retrieve user-scoped document chunks and generate a grounded Gemini answer.
-
-Request body:
-
-```json
-{
-  "userID": "user-123",
-  "query": "What is a primary key?"
-}
-```
-
-The response includes the answer and deduplicated source metadata for the retrieved chunks. `topK` may be supplied in the request body; otherwise `RAG_TOP_K` is used.
-
-## Deployment
-
-CogniForge is deployed as separate frontend and backend services using:
-
-- React + Vite frontend
-- Node.js + Express backend
-- MongoDB Atlas
-- Google Gemini API
-
-The frontend communicates with the deployed Express API through `VITE_API_URL`.
-
-## Author
-
-**Rohan Nayak**
-
-[GitHub repository](https://github.com/rohannayak032/CogniForge)
