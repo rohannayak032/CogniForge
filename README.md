@@ -10,25 +10,19 @@ CogniForge is a full-stack AI workspace for focused conversations, learning, and
 
 ## Features
 
-- Gemini-powered AI conversations
-- Full-screen React AI workspace
-- Persistent conversation history with MongoDB
-- Context-aware conversations
-- PDF document upload and text extraction
-- Document chunking and semantic embeddings
-- Conversation clearing
-- Light and dark themes
-- Suggested prompts
-- Responsive interface
-- Environment-based configuration
-- PDF document upload and text extraction
-- Document chunking and semantic embeddings
-- MongoDB Atlas Vector Search retrieval
+- Gemini-powered AI conversations with persistent chat history
+- PDF document upload, text extraction, and semantic chunking
+- Gemini-powered document embeddings
+- MongoDB Atlas Vector Search for semantic retrieval
+- Retrieval-Augmented Generation (RAG) with grounded responses
+- Source references for retrieved document content
 - User-scoped document retrieval
+- Responsive React interface with light and dark themes
+- Suggested prompts and conversation management
 
 ## Document Processing
 
-CogniForge supports PDF document ingestion and semantic retrieval.
+CogniForge supports PDF-based retrieval augmented generation.
 
 Uploaded PDFs are:
 
@@ -36,9 +30,10 @@ Uploaded PDFs are:
 2. Split into smaller text chunks
 3. Converted into semantic embeddings using Google Gemini
 4. Stored in MongoDB with document and page metadata
-5. Retrieved using MongoDB Atlas Vector Search based on semantic similarity
+5. Retrieved using MongoDB Atlas Vector Search
+6. Provided as context to Gemini for grounded responses
 
-Document retrieval is scoped by user, ensuring that users only retrieve content from their own uploaded documents.
+Responses include source document and page information for retrieved content.
 
 ## Tech Stack
 
