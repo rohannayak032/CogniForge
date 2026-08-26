@@ -3,6 +3,7 @@ const DocumentChunk = require("../models/DocumentChunk");
 const { extractPdfChunks } = require("../services/pdfService");
 const { generateChunkEmbeddings } = require("../services/embeddingService");
 const { retrieveSimilarChunks } = require("../services/retrievalService");
+const { generateGroundedResponse } = require("../services/geminiService");
 
 async function uploadDocument(req, res) {
     const userID = req.body.userID;
@@ -104,4 +105,51 @@ async function searchDocuments(req, res) {
     }
 }
 
-module.exports = { uploadDocument, searchDocuments };
+async function askDocuments(req, res) {
+    const { userID, query, topK } = req.body;
+
+    if (!userID || !query?.trim()) {
+        return res.status(400).json({
+            success: false,
+            message: "userID and query are required"
+        });
+    }
+
+    try {
+        const chunks = await retrieveSimilarChunks(userID, query.trim(), topK);
+        const context = chunks.map((chunk, index) => (
+            `[Source ${index + 1}] ${chunk.documentName} | page ${chunk.pageNumber} | chunk ${chunk.chunkIndex}\n${chunk.text}`
+        )).join("\n\n");
+        const answer = await generateGroundedResponse(context, query.trim());
+        const seenSources = new Set();
+        const sources = chunks.filter((chunk) => {
+            const sourceKey = `${chunk.documentId}:${chunk.pageNumber}:${chunk.chunkIndex}`;
+            if (seenSources.has(sourceKey)) {
+                return false;
+            }
+            seenSources.add(sourceKey);
+            return true;
+        }).map((chunk) => ({
+            documentName: chunk.documentName,
+            documentId: chunk.documentId?.toString(),
+            pageNumber: chunk.pageNumber,
+            chunkIndex: chunk.chunkIndex,
+            score: chunk.score
+        }));
+
+        return res.json({
+            success: true,
+            answer,
+            sources
+        });
+    } catch (error) {
+        console.error(error);
+        const isIndexError = error.message?.includes("Vector Search index");
+        return res.status(isIndexError ? 503 : 500).json({
+            success: false,
+            message: isIndexError ? error.message : "Unable to generate an answer from document context"
+        });
+    }
+}
+
+module.exports = { uploadDocument, searchDocuments, askDocuments };

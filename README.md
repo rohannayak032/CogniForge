@@ -126,6 +126,7 @@ Create `server/.env` using `server/.env.example`:
 PORT=5000
 MONGODB_URI=your_mongodb_connection_string
 GEMINI_API_KEY=your_google_gemini_api_key
+RAG_TOP_K=5
 CLIENT_URL=http://localhost:5173
 ```
 
@@ -175,6 +176,21 @@ Request body:
 ### Clear conversation history
 
 `DELETE /chat/:userID` — clear conversation history.
+
+### Ask a question about uploaded documents
+
+`POST /documents/ask` — retrieve user-scoped document chunks and generate a grounded Gemini answer.
+
+Request body:
+
+```json
+{
+  "userID": "user-123",
+  "query": "What is a primary key?"
+}
+```
+
+The response includes the answer and deduplicated source metadata for the retrieved chunks. `topK` may be supplied in the request body; otherwise `RAG_TOP_K` is used.
 
 ## Deployment
 
