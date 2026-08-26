@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const DocumentChunk = require("../models/DocumentChunk");
 const { generateEmbedding } = require("./embeddingService");
 
@@ -18,9 +19,23 @@ function getTopK(value) {
     return Math.min(topK, MAX_TOP_K);
 }
 
-async function retrieveSimilarChunks(userID, query, requestedTopK) {
+async function retrieveSimilarChunks(userID, query, requestedTopK, documentID) {
+    let documentObjectId;
+    if (documentID) {
+        if (!mongoose.Types.ObjectId.isValid(documentID)) {
+            throw new Error("documentID must be a valid document ID");
+        }
+
+        documentObjectId = new mongoose.Types.ObjectId(documentID);
+    }
+
     const queryVector = await generateEmbedding(query);
     const topK = getTopK(requestedTopK);
+    const filter = { userID: { $eq: userID } };
+
+    if (documentObjectId) {
+        filter.documentId = { $eq: documentObjectId };
+    }
 
     try {
         return await DocumentChunk.aggregate([
@@ -31,9 +46,7 @@ async function retrieveSimilarChunks(userID, query, requestedTopK) {
                     queryVector,
                     numCandidates: Math.max(topK * 10, 50),
                     limit: topK,
-                    filter: {
-                        userID: { $eq: userID }
-                    }
+                    filter
                 }
             },
             {

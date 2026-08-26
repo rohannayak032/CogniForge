@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { getHistory, sendMessage, clearHistory } from '../api/chat';
-import { askDocument, uploadDocument } from '../api/documents';
+import { askDocument, deleteDocument, getDocuments, uploadDocument } from '../api/documents';
 import { getOrCreateUserID } from '../utils/userId';
 import MessageList from './MessageList';
 import ChatInput from './ChatInput';
@@ -17,6 +17,7 @@ function ChatWindow() {
   const [theme, setTheme] = useState(() => localStorage.getItem('cogniforge-theme') || 'light');
   const [mode, setMode] = useState('general');
   const [document, setDocument] = useState(null);
+  const [documents, setDocuments] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const messageListRef = useRef(null);
 
@@ -36,6 +37,14 @@ function ChatWindow() {
 
   useEffect(() => {
     loadMessages();
+  }, [userID]);
+
+  useEffect(() => {
+    getDocuments(userID).then((response) => {
+      const availableDocuments = response?.documents || [];
+      setDocuments(availableDocuments);
+      setDocument(availableDocuments.find((item) => item.status === 'ready') || null);
+    }).catch((err) => setError(err.message || 'Unable to load documents right now.'));
   }, [userID]);
 
   useEffect(() => {
@@ -66,7 +75,7 @@ function ChatWindow() {
 
     try {
       const response = mode === 'document'
-        ? await askDocument(userID, trimmedInput)
+        ? await askDocument(userID, trimmedInput, document._id)
         : await sendMessage(userID, trimmedInput);
 
       setMessages((currentMessages) => [
@@ -98,13 +107,39 @@ function ChatWindow() {
 
     try {
       const response = await uploadDocument(userID, file);
-      setDocument(response?.document || { originalName: file.name, status: 'ready' });
+      const uploadedDocument = response?.document || { originalName: file.name, status: 'ready' };
+      setDocuments((currentDocuments) => [uploadedDocument, ...currentDocuments]);
+      setDocument(uploadedDocument);
       setMode('document');
     } catch (err) {
       setDocument(null);
       setError(err.message || 'Unable to upload and process the PDF right now.');
     } finally {
       setIsUploading(false);
+    }
+  };
+
+  const handleSelectDocument = (selectedDocument) => {
+    setDocument(selectedDocument);
+    setMode('document');
+    setError('');
+  };
+
+  const handleDeleteDocument = async (documentID) => {
+    if (isLoading || isUploading) return;
+    const deletedDocument = documents.find((item) => item._id === documentID);
+    setError('');
+    try {
+      await deleteDocument(userID, documentID);
+      const remainingDocuments = documents.filter((item) => item._id !== documentID);
+      setDocuments(remainingDocuments);
+      if (document?._id === documentID) {
+        const nextDocument = remainingDocuments.find((item) => item.status === 'ready') || null;
+        setDocument(nextDocument);
+        if (!nextDocument) setMode('general');
+      }
+    } catch (err) {
+      setError(err.message || `Unable to delete ${deletedDocument?.originalName || 'document'}.`);
     }
   };
 
@@ -161,11 +196,14 @@ function ChatWindow() {
 
         {isSidebarOpen ? (
           <DocumentControls
+            documents={documents}
             document={document}
             mode={mode}
             isUploading={isUploading}
             onModeChange={setMode}
             onUpload={handleUpload}
+            onSelect={handleSelectDocument}
+            onDelete={handleDeleteDocument}
           />
         ) : null}
 

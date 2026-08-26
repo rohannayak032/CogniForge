@@ -1,9 +1,14 @@
+const mongoose = require("mongoose");
 const Document = require("../models/Document");
 const DocumentChunk = require("../models/DocumentChunk");
 const { extractPdfChunks } = require("../services/pdfService");
 const { generateChunkEmbeddings } = require("../services/embeddingService");
 const { retrieveSimilarChunks } = require("../services/retrievalService");
 const { generateGroundedResponse } = require("../services/geminiService");
+
+function isValidDocumentID(documentID) {
+    return mongoose.Types.ObjectId.isValid(documentID);
+}
 
 async function uploadDocument(req, res) {
     const userID = req.body.userID;
@@ -106,7 +111,7 @@ async function searchDocuments(req, res) {
 }
 
 async function askDocuments(req, res) {
-    const { userID, query, topK } = req.body;
+    const { userID, query, topK, documentID } = req.body;
 
     if (!userID || !query?.trim()) {
         return res.status(400).json({
@@ -116,7 +121,14 @@ async function askDocuments(req, res) {
     }
 
     try {
-        const chunks = await retrieveSimilarChunks(userID, query.trim(), topK);
+        if (documentID && !isValidDocumentID(documentID)) {
+            return res.status(400).json({
+                success: false,
+                message: "documentID must be a valid document ID"
+            });
+        }
+
+        const chunks = await retrieveSimilarChunks(userID, query.trim(), topK, documentID);
         const context = chunks.map((chunk, index) => (
             `[Source ${index + 1}] ${chunk.documentName} | page ${chunk.pageNumber} | chunk ${chunk.chunkIndex}\n${chunk.text}`
         )).join("\n\n");
@@ -152,4 +164,49 @@ async function askDocuments(req, res) {
     }
 }
 
-module.exports = { uploadDocument, searchDocuments, askDocuments };
+async function listDocuments(req, res) {
+    const { userID } = req.params;
+
+    if (!userID) {
+        return res.status(400).json({ success: false, message: "userID is required" });
+    }
+
+    try {
+        const documents = await Document.find({ userID })
+            .select("_id originalName mimeType size pageCount status createdAt updatedAt")
+            .sort({ createdAt: -1 })
+            .lean();
+        return res.json({ success: true, documents });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: "Unable to list documents" });
+    }
+}
+
+async function deleteDocument(req, res) {
+    const { documentID } = req.params;
+    const { userID } = req.body;
+
+    if (!userID || !isValidDocumentID(documentID)) {
+        return res.status(400).json({
+            success: false,
+            message: "userID and a valid documentID are required"
+        });
+    }
+
+    try {
+        const document = await Document.findOne({ _id: documentID, userID }).select("_id").lean();
+        if (!document) {
+            return res.status(404).json({ success: false, message: "Document not found" });
+        }
+
+        await DocumentChunk.deleteMany({ documentId: document._id });
+        await Document.deleteOne({ _id: document._id, userID });
+        return res.json({ success: true, message: "Document deleted" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: "Unable to delete document" });
+    }
+}
+
+module.exports = { uploadDocument, searchDocuments, askDocuments, listDocuments, deleteDocument };

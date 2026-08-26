@@ -28,12 +28,26 @@ export function uploadDocument(userID, file) {
     });
 }
 
-export function askDocument(userID, query, topK = 5) {
+export function getDocuments(userID) {
+    return request(`/documents/${encodeURIComponent(userID)}`);
+}
+
+export function deleteDocument(userID, documentID) {
+    return request(`/documents/${encodeURIComponent(documentID)}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userID }),
+    });
+}
+
+export function askDocument(userID, query, documentID, topK = 5) {
     return request('/documents/ask', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userID, query, topK }),
+        body: JSON.stringify({ userID, query, documentID, topK }),
     });
 }

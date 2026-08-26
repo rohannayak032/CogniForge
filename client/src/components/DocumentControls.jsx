@@ -1,4 +1,4 @@
-function DocumentControls({ document, mode, isUploading, onModeChange, onUpload }) {
+function DocumentControls({ documents, document, mode, isUploading, onModeChange, onUpload, onSelect, onDelete }) {
   const isReady = document?.status === 'ready';
 
   return (
@@ -18,6 +18,19 @@ function DocumentControls({ document, mode, isUploading, onModeChange, onUpload 
         <span aria-hidden="true">↑</span>
         <span>{isUploading ? 'Processing PDF...' : 'Upload a PDF'}</span>
       </label>
+
+      <div className="document-library">
+        <p className="sidebar-label">Your documents</p>
+        {documents.length ? documents.map((item) => (
+          <div className={`library-item ${item._id === document?._id ? 'active' : ''}`} key={item._id}>
+            <button type="button" onClick={() => onSelect(item)} disabled={item.status !== 'ready'}>
+              <strong>{item.originalName}</strong>
+              <span>{item.status === 'ready' ? `${item.pageCount} pages` : 'Processing...'}</span>
+            </button>
+            <button type="button" className="delete-document" onClick={() => onDelete(item._id)} aria-label={`Delete ${item.originalName}`} title="Delete document">×</button>
+          </div>
+        )) : <p className="document-hint">No documents uploaded yet.</p>}
+      </div>
 
       {document ? (
         <div className={`active-document ${isReady ? 'ready' : ''}`}>

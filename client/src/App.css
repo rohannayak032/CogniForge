@@ -1071,6 +1071,76 @@
   line-height: 1.45;
 }
 
+.document-library {
+  margin-top: 20px;
+}
+
+.library-item {
+  display: flex;
+  align-items: stretch;
+  gap: 3px;
+  margin-bottom: 4px;
+}
+
+.library-item > button:first-child {
+  min-width: 0;
+  flex: 1;
+  padding: 8px 9px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.library-item > button:first-child:hover:not(:disabled),
+.library-item.active > button:first-child {
+  border-color: #c9ddd2;
+  background: #eaf2ec;
+  color: var(--accent-dark);
+}
+
+.library-item > button:first-child:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.library-item strong,
+.library-item span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.library-item strong {
+  color: var(--ink);
+  font-size: 0.75rem;
+}
+
+.library-item span {
+  margin-top: 2px;
+  font-size: 0.67rem;
+}
+
+.delete-document {
+  width: 28px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #a37e7a;
+  cursor: pointer;
+  font-size: 1.1rem;
+}
+
+.delete-document:hover,
+.delete-document:focus-visible {
+  background: #fff0ed;
+  color: #a13c32;
+}
+
 .message-sources {
   margin-top: 14px;
   padding-top: 10px;
@@ -1118,4 +1188,16 @@
 
 .theme-dark .message-sources {
   border-color: var(--line);
+}
+
+.theme-dark .library-item > button:first-child:hover:not(:disabled),
+.theme-dark .library-item.active > button:first-child {
+  border-color: #354b70;
+  background: #202b3d;
+}
+
+.theme-dark .delete-document:hover,
+.theme-dark .delete-document:focus-visible {
+  background: #382a32;
+  color: #ff9d91;
 }
