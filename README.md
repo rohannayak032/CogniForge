@@ -11,7 +11,9 @@ CogniForge is a full-stack AI workspace that combines general AI conversations w
 ## Features
 
 - Gemini-powered AI conversations
-- Persistent conversation history
+- Multiple independent conversations with persistent history
+- Conversation switching, creation, and deletion
+- Automatic conversation titles
 - PDF upload and text extraction
 - Page-aware text chunking and Gemini embeddings
 - MongoDB Atlas Vector Search
@@ -45,31 +47,27 @@ Multer, PDF.js
 
 ## Architecture
 
-```text
 React + Vite
-  ↓
+      ↓
 Express API
-  ↓
-General Chat → Gemini
-
-Document RAG
-  ↓
-PDF Extraction
-  ↓
-Chunking
-  ↓
-Gemini Embeddings
-  ↓
-MongoDB Atlas
-  ↓
-Vector Search
-  ↓
-Relevant Chunks
-  ↓
-Gemini
-  ↓
-Grounded Answer + Sources
-```
+      ↓
+┌───────────────┐
+│               │                
+Chat         Document RAG
+│               │
+Conversations   PDF Extraction
+│               │
+Gemini          Chunking
+                │
+            Embeddings
+                │
+          MongoDB Atlas
+                │
+           Vector Search
+                │
+          Relevant Chunks
+                │
+              Gemini
 
 ## RAG Pipeline
 
