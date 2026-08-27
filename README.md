@@ -47,27 +47,29 @@ Multer, PDF.js
 
 ## Architecture
 
-React + Vite
-      ↓
-Express API
-      ↓
-┌───────────────┐
-│               │                
-Chat         Document RAG
-│               │
-Conversations   PDF Extraction
-│               │
-Gemini          Chunking
-                │
-            Embeddings
-                │
-          MongoDB Atlas
-                │
-           Vector Search
-                │
-          Relevant Chunks
-                │
-              Gemini
+```mermaid
+flowchart TD
+    A[React + Vite] --> B[Express API]
+
+    B --> C[General Chat]
+    C --> D[Gemini API]
+    C --> E[Conversation Service]
+    E --> F[(MongoDB)]
+
+    B --> G[Document RAG]
+
+    G --> H[PDF Extraction]
+    H --> I[Page-Aware Chunking]
+    I --> J[Gemini Embeddings]
+    J --> K[(MongoDB Atlas)]
+
+    G --> L[Query Embedding]
+    L --> K
+    K --> M[Relevant Chunks]
+    M --> D
+
+    D --> N[Grounded Response]
+    M --> N
 
 ## RAG Pipeline
 
