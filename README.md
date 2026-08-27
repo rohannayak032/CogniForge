@@ -57,7 +57,6 @@ flowchart TD
     E --> F[(MongoDB)]
 
     B --> G[Document RAG]
-
     G --> H[PDF Extraction]
     H --> I[Page-Aware Chunking]
     I --> J[Gemini Embeddings]
@@ -70,6 +69,7 @@ flowchart TD
 
     D --> N[Grounded Response]
     M --> N
+```
 
 ## RAG Pipeline
 
