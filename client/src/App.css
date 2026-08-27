@@ -549,6 +549,85 @@
   margin-top: 32px;
 }
 
+.conversation-list {
+  min-height: 0;
+  margin-top: 24px;
+  overflow-y: auto;
+}
+
+.conversation-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.conversation-list-header .sidebar-label {
+  margin-bottom: 10px;
+}
+
+.conversation-add,
+.delete-conversation {
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.conversation-add {
+  width: 26px;
+  height: 26px;
+  margin-bottom: 7px;
+  font-size: 1.1rem;
+}
+
+.conversation-add:hover:not(:disabled),
+.conversation-add:focus-visible {
+  background: #eaf2ec;
+  color: var(--accent-dark);
+}
+
+.conversation-entry {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  margin-bottom: 3px;
+}
+
+.conversation-entry .conversation-item {
+  min-width: 0;
+  flex: 1;
+}
+
+.conversation-entry.active .conversation-item {
+  background: #eaf2ec;
+  color: var(--accent-dark);
+}
+
+.conversation-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.delete-conversation {
+  width: 28px;
+  font-size: 1.05rem;
+}
+
+.delete-conversation:hover:not(:disabled),
+.delete-conversation:focus-visible {
+  background: #fff0ed;
+  color: #a13c32;
+}
+
+.conversation-empty {
+  margin: 0 10px;
+  color: #9aa8a2;
+  font-size: 0.72rem;
+}
+
 .sidebar-label {
   margin: 0 10px 10px;
   color: #8a9a94;
@@ -1174,6 +1253,21 @@
 .theme-dark .active-document {
   border-color: var(--line);
   background: #1b2230;
+}
+
+.theme-dark .conversation-add:hover:not(:disabled),
+.theme-dark .conversation-add:focus-visible,
+.theme-dark .conversation-entry.active .conversation-item,
+.theme-dark .conversation-entry .conversation-item:hover:not(:disabled),
+.theme-dark .conversation-entry .conversation-item:focus-visible {
+  background: #202b3d;
+  color: var(--accent-dark);
+}
+
+.theme-dark .delete-conversation:hover:not(:disabled),
+.theme-dark .delete-conversation:focus-visible {
+  background: #382a32;
+  color: #ff9d91;
 }
 
 .theme-dark .mode-toggle button.selected {

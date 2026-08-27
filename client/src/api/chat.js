@@ -23,14 +23,37 @@ async function request(path, options = {}) {
     return data;
 }
 
-export function getHistory(userID) {
-    return request(`/chat/${encodeURIComponent(userID)}`);
+export function getHistory(conversationID, userID) {
+    return getConversation(conversationID, userID);
 }
 
-export function sendMessage(userID, prompt) {
+export function createConversation(userID) {
+    return request('/chat/conversations', {
+        method: 'POST',
+        body: JSON.stringify({ userID }),
+    });
+}
+
+export function getConversations(userID) {
+    return request(`/chat/conversations/${encodeURIComponent(userID)}`);
+}
+
+export function getConversation(conversationID, userID) {
+    const path = `/chat/conversations/${encodeURIComponent(conversationID)}?userID=${encodeURIComponent(userID)}`;
+    return request(path);
+}
+
+export function deleteConversation(conversationID, userID) {
+    return request(`/chat/conversations/${encodeURIComponent(conversationID)}`, {
+        method: 'DELETE',
+        body: JSON.stringify({ userID }),
+    });
+}
+
+export function sendMessage(userID, prompt, conversationID) {
     return request('/chat', {
         method: 'POST',
-        body: JSON.stringify({ userID, prompt }),
+        body: JSON.stringify({ userID, prompt, conversationID }),
     });
 }
 
